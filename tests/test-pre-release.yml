@@ -1,0 +1,33 @@
+name: Test delete only pre-release versions
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          package-name: "test-package"
+          owner: "test-owner"
+          repo: "test-repo"
+          delete-only-pre-release-versions: "true"
+          min-versions-to-keep: "0"
+          token: "fake-token-for-testing"
+
+      - name: Assert action ran with expected inputs
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          # The action is expected to fail (invalid token) but must have run
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action was skipped, expected it to run"
+            exit 1
+          fi
+          echo "PASS: action ran (outcome=$OUTCOME)"

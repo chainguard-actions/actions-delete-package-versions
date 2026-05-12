@@ -1,0 +1,47 @@
+{
+  "name": "typescript-action",
+  "version": "0.0.0",
+  "private": true,
+  "description": "TypeScript template action",
+  "main": "lib/main.js",
+  "scripts": {
+    "format": "prettier --write **/*.ts",
+    "format-check": "prettier --check **/*.ts",
+    "lint": "eslint src/**/*.ts --fix",
+    "lint-check": "eslint src/**/*.ts",
+    "test": "jest",
+    "build": "npm run format-check && npm run lint-check && npm run test && tsc",
+    "pack": "rm -rf ./lib ./dist && npm run build && ncc build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/actions/typescript-action.git"
+  },
+  "keywords": [
+    "actions",
+    "node",
+    "setup"
+  ],
+  "author": "YourNameOrOrganization",
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^1.9.1",
+    "@actions/github": "^2.1.1",
+    "rxjs": "^6.5.4"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.4.0",
+    "@types/node": "^12.7.12",
+    "@typescript-eslint/parser": "^2.8.0",
+    "@vercel/ncc": "^0.31.1",
+    "eslint": "^8.9.0",
+    "eslint-plugin-github": "^4.3.5",
+    "eslint-plugin-jest": "^22.21.0",
+    "jest": "^27.3.1",
+    "jest-circus": "^27.3.1",
+    "js-yaml": "^3.13.1",
+    "prettier": "^1.19.1",
+    "ts-jest": "^27.0.7",
+    "typescript": "^3.6.4"
+  }
+}
