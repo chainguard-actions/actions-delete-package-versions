@@ -1,7 +1,0 @@
-{
-  "owner": "actions",
-  "name": "delete-package-versions",
-  "visibility": "internal",
-  "description": "Deletes package versions",
-  "block_publish": false
-}
