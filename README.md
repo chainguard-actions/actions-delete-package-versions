@@ -8,7 +8,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 
 | Version | Tag | Upstream commit |
 |---------|-----|-----------------|
-| v3.0.1 | [`v3.0.1`](https://github.com/chainguard-actions/actions-delete-package-versions/tree/v3.0.1) | — |
+| v3.0.1 | [`v3.0.1`](https://github.com/chainguard-actions/actions-delete-package-versions/tree/v3.0.1) | [`c5e6444`](https://github.com/actions/delete-package-versions/commit/c5e64443ea1242014b4011a563c5bccc90867ac8) |
 | v5.0.0 | [`v5.0.0`](https://github.com/chainguard-actions/actions-delete-package-versions/tree/v5.0.0) | — |
 
 ## Privacy
