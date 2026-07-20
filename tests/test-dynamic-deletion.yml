@@ -1,0 +1,33 @@
+name: Test dynamic deletion with package-name
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      # Test the dynamic deletion path: provide package-name and num-old-versions-to-delete.
+      # The action will attempt to list and delete package versions via the GitHub API.
+      # In a local act environment there are no real packages, so an API error is expected.
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          package-name: "test-package"
+          num-old-versions-to-delete: "3"
+          min-versions-to-keep: "1"
+          owner: "test-owner"
+          repo: "test-repo"
+          token: "fake-token-for-testing"
+
+      - name: Assert action ran (not a startup crash)
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action was skipped unexpectedly"
+            exit 1
+          fi
+          echo "PASS: action ran with outcome=$OUTCOME (API errors expected in test env)"

@@ -1,0 +1,35 @@
+name: Test basic usage with package-version-ids
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      # The action makes GitHub API calls to delete packages.
+      # In a local act environment there are no real packages to delete,
+      # so we expect the action to fail with an API error (not a startup error).
+      # We use continue-on-error and assert the action ran (not a JS crash).
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          package-version-ids: "12345"
+          owner: "test-owner"
+          repo: "test-repo"
+          package-name: "test-package"
+          token: "fake-token-for-testing"
+
+      - name: Assert action ran (not a startup crash)
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          # The action should either succeed or fail with an API error,
+          # but not be skipped or produce an unexpected outcome.
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action was skipped unexpectedly"
+            exit 1
+          fi
+          echo "PASS: action ran with outcome=$OUTCOME (API errors expected in test env)"

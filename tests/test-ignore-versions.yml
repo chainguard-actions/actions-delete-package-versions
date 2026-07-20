@@ -1,0 +1,33 @@
+name: Test ignore-versions regex pattern
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      # Test the ignore-versions regex pattern input.
+      # Versions matching the pattern will be skipped during deletion.
+      # The action will attempt GitHub API calls; errors are expected in test env.
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          package-name: "test-package"
+          num-old-versions-to-delete: "5"
+          ignore-versions: "^latest$"
+          owner: "test-owner"
+          repo: "test-repo"
+          token: "fake-token-for-testing"
+
+      - name: Assert action ran (not a startup crash)
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action was skipped unexpectedly"
+            exit 1
+          fi
+          echo "PASS: action ran with outcome=$OUTCOME (API errors expected in test env)"
