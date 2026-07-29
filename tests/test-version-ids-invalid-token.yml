@@ -1,0 +1,30 @@
+name: Test deletion by package-version-ids with invalid token
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      # When package-version-ids is provided, the action takes a direct deletion
+      # path. With a fake token it should fail with an API/auth error.
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          package-name: my-test-package
+          package-type: container
+          package-version-ids: "12345,67890"
+          token: fake-token-for-testing
+
+      - name: Assert action failed (expected with invalid token)
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          if [ "$OUTCOME" != "failure" ]; then
+            echo "FAIL: expected action to fail with invalid token, got '$OUTCOME'"
+            exit 1
+          fi
+          echo "PASS: action correctly failed with invalid token when using package-version-ids"

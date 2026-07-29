@@ -1,0 +1,33 @@
+name: Test invalid combination with delete-only-untagged-versions
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      # When delete-only-untagged-versions=true AND num-old-versions-to-delete > 1,
+      # checkInput() returns false → action fails with "Invalid input combination".
+      # Note: delete-only-untagged-versions only works for container package type.
+      - id: action
+        uses: .
+        with:
+          package-name: some-container-image
+          package-type: container
+          num-old-versions-to-delete: "2"
+          delete-only-untagged-versions: "true"
+        continue-on-error: true
+
+      - name: Assert invalid untagged + num-old-versions-to-delete combination fails
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          if [ "$OUTCOME" != "failure" ]; then
+            echo "FAIL: expected action to fail for invalid untagged + num-old-versions-to-delete combination, got outcome=$OUTCOME"
+            exit 1
+          fi
+          echo "PASS: action correctly rejected invalid untagged + num-old-versions-to-delete combination"

@@ -1,0 +1,26 @@
+name: Test no-op when num-old-versions-to-delete is 0
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      # When num-old-versions-to-delete <= 0 AND min-versions-to-keep < 0 (default -1),
+      # the action logs "Number of old versions to delete input is 0 or less, no versions will be deleted"
+      # and returns successfully without making any API calls.
+      - id: action
+        uses: .
+        with:
+          package-name: some-nonexistent-package
+          package-type: npm
+          num-old-versions-to-delete: "0"
+          # min-versions-to-keep defaults to -1, so the no-op branch is taken
+
+      - name: Assert action succeeded (no-op path)
+        run: |
+          echo "Action completed successfully with num-old-versions-to-delete=0"
+          echo "PASS"

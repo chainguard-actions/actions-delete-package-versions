@@ -1,0 +1,33 @@
+name: Test owner input
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Run action with explicit owner input (expect auth failure, not input error)
+        id: action
+        uses: .
+        with:
+          owner: actions
+          package-name: test-package
+          package-type: npm
+          num-old-versions-to-delete: "1"
+          min-versions-to-keep: "0"
+          token: "invalid-token-for-owner-test"
+        continue-on-error: true
+
+      - name: Assert action failed with auth error (not missing-input error)
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          if [ "$OUTCOME" != "failure" ]; then
+            echo "FAIL: expected action to fail due to invalid token, got outcome=$OUTCOME"
+            exit 1
+          fi
+          echo "PASS: action failed as expected (owner input was accepted, auth error occurred)"

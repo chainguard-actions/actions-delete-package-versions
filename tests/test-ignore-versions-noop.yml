@@ -1,0 +1,27 @@
+name: Test ignore-versions regex with no-op delete count
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      # When num-old-versions-to-delete=0 and min-versions-to-keep=-1 (default),
+      # the action takes the no-op path regardless of ignore-versions.
+      # This validates that the ignore-versions input is accepted without error.
+      - id: action
+        uses: .
+        with:
+          package-name: some-nonexistent-package
+          package-type: container
+          num-old-versions-to-delete: "0"
+          ignore-versions: "^v1\\..*$"
+          # min-versions-to-keep defaults to -1 → no-op branch
+
+      - name: Assert action succeeded with ignore-versions regex
+        run: |
+          echo "Action completed successfully with ignore-versions regex and num-old-versions-to-delete=0"
+          echo "PASS"

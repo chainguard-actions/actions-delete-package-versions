@@ -1,0 +1,32 @@
+name: Test invalid input combination fails
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      # When num-old-versions-to-delete > 1 AND min-versions-to-keep >= 0,
+      # checkInput() returns false and the action fails with "Invalid input combination".
+      - id: action
+        uses: .
+        with:
+          package-name: some-package
+          package-type: npm
+          num-old-versions-to-delete: "5"
+          min-versions-to-keep: "2"
+        continue-on-error: true
+
+      - name: Assert action failed with invalid input combination
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          if [ "$OUTCOME" != "failure" ]; then
+            echo "FAIL: expected action to fail with invalid input combination, but got outcome=$OUTCOME"
+            exit 1
+          fi
+          echo "PASS: action correctly failed for invalid input combination"

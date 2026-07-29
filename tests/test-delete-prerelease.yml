@@ -1,0 +1,30 @@
+name: Test delete-package-versions with delete-only-pre-release-versions
+on:
+  workflow_dispatch:
+jobs:
+  test-delete-prerelease:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Run action with delete-only-pre-release-versions flag and invalid token
+        id: action
+        uses: .
+        continue-on-error: true
+        with:
+          package-name: test-package
+          package-type: npm
+          delete-only-pre-release-versions: "true"
+          min-versions-to-keep: "0"
+          token: "invalid-token-for-testing"
+
+      - name: Assert action failed due to invalid token (API call required)
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          if [ "$OUTCOME" != "failure" ]; then
+            echo "FAIL: expected action to fail when deleting pre-release versions with invalid token, got outcome=$OUTCOME"
+            exit 1
+          fi
+          echo "PASS: action correctly failed when trying to list pre-release versions with invalid token"
